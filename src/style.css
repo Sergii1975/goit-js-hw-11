@@ -1,0 +1,82 @@
+body {
+  position: relative;
+  background-color: #a3bd9f;
+  
+}
+
+.unvisible {
+    display: none;
+  }
+
+.gallery {
+  width: 1600px;
+    padding: 0 15px;
+    display: grid;
+    grid-template-columns: repeat(4, 370px);
+    gap: 30px;
+    margin: 0 auto;
+    
+  }
+
+  img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.search-form > input {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  width: 226px;
+  height: 36px;
+  border-radius: 12px;
+  background: #31c3e7;
+}
+
+button {
+  display: block;
+    width: 120px;
+  height: 36px;
+margin: 12px;
+  line-height: 100%;
+  text-align: center;
+  color: #ffffff;
+
+  border-radius: 12px;
+
+  background: linear-gradient(180deg, #a6c456 0%, #bfce6c 100%);
+  box-shadow: 0px 2px 4px rgba(194, 202, 119, 0.479);
+
+  transition: background 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+form {
+    display: flex;
+    justify-content: center;
+}
+button.load-more {
+  position: absolute;
+  left: 50%;
+  
+  cursor: pointer;
+  background:linear-gradient(180deg, #b15225 0%, #e41405 100%);
+}
+div.info {
+  display: flex;
+  text-align: center;
+  background-color: rgb(154, 190, 190);
+}
+.gallery__link {
+text-decoration: none;
+color: black;
+}
+.info-item:not(:last-child) {
+  margin-right: 10px;
+  align-items: center;
+}
+.photo-card {
+  border: 1px solid rgb(90, 88, 92);
+  border-radius: 5px;
+  overflow: hidden;
+}
