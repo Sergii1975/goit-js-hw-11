@@ -28,10 +28,15 @@ axios.interceptors.response.use(
 );
 
 async function fetchImages(query, page, perPage) {
-  const response = await axios.get(
-    `?key=${API}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`,
-  );
-  return response.data;
+  try {
+    const response = await axios.get(
+      `?key=${API}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`,
+    );
+    return response.data;
+  }
+  catch (error) {
+      console.log(error);
+  }
 }
 
 function renderGallery(images) {
