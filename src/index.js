@@ -1,10 +1,9 @@
-import axios from 'axios';
+
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-axios.defaults.baseURL = "https://pixabay.com/api/";
-const API = "36982513-bf126f349b94d33a115a611fc";
+import { fetchImages } from './get-read';
 
 const gallery = document.querySelector(".gallery");
 const searchForm = document.querySelector(".search-form");
@@ -16,28 +15,57 @@ let simpleLightBox;
 const per_page = 40;
 
 searchForm.addEventListener('submit', onSearchForm);
-loading.classList.add('unvisible')
-axios.interceptors.response.use(
-  response => {
-    return response;
-  },
-  error => {
-    Notiflix.Notify.failure('Something went wrong. Please try again later.');
-    return Promise.reject(error);
-  },
-);
+loading.classList.add('unvisible');
 
-async function fetchImages(query, page, per_page) {
-  try {
-    const response = await axios.get(
-      `?key=${API}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${per_page}`,
+function onSearchForm(e) {
+  e.preventDefault();
+  page = 1;
+  query = e.currentTarget.elements.searchQuery.value.trim();
+  gallery.innerHTML = '';
+loading.classList.remove('unvisible')
+  if (query === '') {
+    Notiflix.Notify.failure(
+      'The search string cannot be empty. Please specify your search query.',
     );
-    return response.data;
+    loading.classList.add('unvisible')
+    return;
   }
-  catch (error) {
-      console.log(error);
-  }
+  fetchImages(query, page, per_page)
+    .then(data => {
+      page += 1;
+      if (data.totalHits === 0) {
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.',
+        );
+      } else {
+        renderGallery(data.hits);
+        simpleLightBox = new SimpleLightbox('.gallery a').refresh();
+        Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+      }
+    })
+    .catch(error => console.log(error))
+    .finally(() => {
+      searchForm.reset();
+    });
 }
+
+loading.addEventListener('click', () => {
+  simpleLightBox.destroy();
+  fetchImages(query, page, per_page)
+    .then((data) => {
+      renderGallery(data.hits);
+      page += 1;
+      simpleLightBox = new SimpleLightbox('.gallery a').refresh();
+      const totalPages = Math.ceil(data.totalHits / per_page);
+      if (page > totalPages) {
+        Notiflix.Notify.failure(
+          "We're sorry, but you've reached the end of search results.",
+        );
+      loading.classList.add('unvisible')
+      }
+    })
+    .catch((error) => console.log(error));
+});
 
 function renderGallery(images) {
   if (!gallery) {
@@ -87,54 +115,3 @@ function renderGallery(images) {
     behavior: 'smooth',
   });
 }
-
-function onSearchForm(e) {
-  e.preventDefault();
-  page = 1;
-  query = e.currentTarget.elements.searchQuery.value.trim();
-  gallery.innerHTML = '';
-loading.classList.remove('unvisible')
-  if (query === '') {
-    Notiflix.Notify.failure(
-      'The search string cannot be empty. Please specify your search query.',
-    );
-    loading.classList.add('unvisible')
-    return;
-  }
-  fetchImages(query, page, per_page)
-    .then(data => {
-      page += 1;
-      if (data.totalHits === 0) {
-        Notiflix.Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.',
-        );
-      } else {
-        renderGallery(data.hits);
-        simpleLightBox = new SimpleLightbox('.gallery a').refresh();
-        Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
-      }
-    })
-    .catch(error => console.log(error))
-    .finally(() => {
-      searchForm.reset();
-    });
-}
-loading.addEventListener('click', () => {
-  simpleLightBox.destroy();
-  fetchImages(query, page, per_page)
-    .then((data) => {
-      renderGallery(data.hits);
-      page += 1;
-      simpleLightBox = new SimpleLightbox('.gallery a').refresh();
-      const totalPages = Math.ceil(data.totalHits / per_page);
-      if (page > totalPages) {
-        Notiflix.Notify.failure(
-          "We're sorry, but you've reached the end of search results.",
-        );
-      loading.classList.add('unvisible')
-      }
-    })
-    .catch((error) => console.log(error));
-});
-
-
