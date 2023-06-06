@@ -13,7 +13,7 @@ const loading = document.querySelector("button.load-more")
 let query = '';
 let page = 1;
 let simpleLightBox;
-const perPage = 40;
+const per_page = 40;
 
 searchForm.addEventListener('submit', onSearchForm);
 loading.classList.add('unvisible')
@@ -27,10 +27,10 @@ axios.interceptors.response.use(
   },
 );
 
-async function fetchImages(query, page, perPage) {
+async function fetchImages(query, page, per_page) {
   try {
     const response = await axios.get(
-      `?key=${API}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`,
+      `?key=${API}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${per_page}`,
     );
     return response.data;
   }
@@ -101,9 +101,9 @@ loading.classList.remove('unvisible')
     loading.classList.add('unvisible')
     return;
   }
-
-  fetchImages(query, page, perPage)
+  fetchImages(query, page, per_page)
     .then(data => {
+      page += 1;
       if (data.totalHits === 0) {
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.',
@@ -120,13 +120,18 @@ loading.classList.remove('unvisible')
     });
 }
 loading.addEventListener('click', () => {
-  fetchImages(query, page, perPage)
+  simpleLightBox.destroy();
+  fetchImages(query, page, per_page)
     .then((data) => {
       renderGallery(data.hits);
       page += 1;
-simpleLightBox = new SimpleLightbox('.gallery a').refresh();
-      if (page > 1) {
-        loading.classList.remove('unvisible');
+      simpleLightBox = new SimpleLightbox('.gallery a').refresh();
+      const totalPages = Math.ceil(data.totalHits / per_page);
+      if (page > totalPages) {
+        Notiflix.Notify.failure(
+          "We're sorry, but you've reached the end of search results.",
+        );
+      loading.classList.add('unvisible')
       }
     })
     .catch((error) => console.log(error));
