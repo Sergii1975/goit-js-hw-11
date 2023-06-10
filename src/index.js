@@ -106,12 +106,12 @@ function renderGallery(images) {
       .join('');
     gallery.insertAdjacentHTML('beforeend', markup);
   
-  const { height: imageHeight } = document
+  const { height: cardHeight } = document
     .querySelector('.gallery')
     .firstElementChild.getBoundingClientRect();
-
+  
   window.scrollBy({
-    top: imageHeight * 2,
+    top: cardHeight / 4,
     behavior: 'smooth',
   });
 }
